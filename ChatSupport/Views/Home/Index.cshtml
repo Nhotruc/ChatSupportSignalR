@@ -36,6 +36,7 @@
         $(function () {
             // Declare a proxy to reference the hub.
             var chat = $.connection.chatHub;
+            
             // Create a function that the hub can call to broadcast messages.
             chat.client.receive = function (message) {
                 console.log('receive is call')
@@ -55,16 +56,22 @@
                         '    <time datetime="2019-06-06T13:00">2 phút trước</time> ' +
                       '  </div> ' +
                   '  </div> ' +
-                '</div> ')
+                '</div> ').scrollTop(1000000);
             };
 
             var name = null;
             
             $.connection.hub.start().done(function () {
-                $('#btn-chat').click(function () {
-                    while (name == null) {
-                        name = prompt('Nhập tên của mình vào');
+                function handlerSend() {
+                   
+                    if (name == null) {
+                        name = prompt('Tên của bạn là:');
+                        if (name == null) {
+                            alert('Tin nhắn không được gửi');
+                            return;
+                        }
                     }
+
                     var message = $('#txt-input').val()
                     if ($.trim(message)=="")
                         return;
@@ -78,11 +85,18 @@
                        ' <div class="col-md-2 col-xs-2 nopadding avatar"> ' +
                            ' <div class="avatar-info"> ' +
                                ' <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive "> ' +
-                               ' <div class="nickname">ID_Khach</div> ' +
+                               ' <div class="nickname">' + name + '</div> ' +
                            ' </div> ' +
                        ' </div> ' +
-                   ' </div>')
+                   ' </div>').scrollTop(1000000);
                     $('#txt-input').val('').focus();
+                }
+                $('#btn-chat').click(handlerSend);
+
+                $('#txt-input').on('keypress', function (e) {
+                    if (e.which === 13) {
+                        handlerSend()
+                    }
                 });
             });
         });

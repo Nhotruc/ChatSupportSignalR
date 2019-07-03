@@ -13,7 +13,7 @@ namespace ChatSupport.signalr.hubs
     {
         private static string adminId="";
 
-        private HashSet<string> customerIds = new HashSet<string>();
+        private static HashSet<string> customerIds = new HashSet<string>();
         public void sendToAdmin(string name,string message)
         {
             Debug.WriteLine("sendToAdmin is call");
@@ -26,7 +26,7 @@ namespace ChatSupport.signalr.hubs
             }
             if (!string.IsNullOrEmpty(adminId))
             {
-                Clients.Client(adminId).receive(Context.ConnectionId,message);
+                Clients.Client(adminId).receive(Context.ConnectionId,name,message);
             }
         }
 
@@ -35,10 +35,12 @@ namespace ChatSupport.signalr.hubs
             Debug.WriteLine("sendToCustomer is call");
             if (customerIds.Contains(connectId))
             {
+                Debug.WriteLine("vo 38"+connectId+"|"+message);
+
                 Clients.Client(connectId).receive(message);
             } else
             {
-
+                Debug.WriteLine("vo 43");
             }
         }
 
