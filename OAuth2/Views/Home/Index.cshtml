@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css'>
+    <link href="css.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div>
+        <button id="openchat-button" class="btn btn-info"><span class="far fa-comment-dots"></span> </button>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#openchat-button").click(function () {
+                $(this).hide();
+                $(".chat-window").show()
+
+            })
+            $("#minim_chat_window").click(function () {
+                $(".chat-window").hide();
+                $("#openchat-button").show();
+            })
+        });
+    </script>
+    <div class="row chat-window col-xs-4 col-md-4 nopadding" style="display:none">
+        <div class="col-xs-12 col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading top-bar">
+                    <div class="col-md-8 col-xs-8">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Hỗ trợ khách hàng</h3>
+                        <h5 style="color: lightslategray"> Nhân viên hỗ trợ: Admin</h5>
+                    </div>
+                    <div class="col-md-4 col-xs-4" style="text-align: right;" title="Ẩn xuống phía dưới">
+                        <a><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim"></span></a>
+                    </div>
+                </div>
+                <div class="panel-body msg_container_base">
+                    <div class="row msg_container base_receive">
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <div class="avatar-info">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive ">
+                                <div class="nickname">Nhân viên hỗ trợ</div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_receive">
+                                <p>
+                                    Chào bạn, tôi có thể giúp gì cho bạn?
+                                </p>
+                                <time datetime="2019-06-06T13:00">2 phút trước</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row msg_container base_sent">
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_sent">
+                                <p>Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?</p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <div class="avatar-info">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive ">
+                                <div class="nickname">ID_Khach</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row msg_container base_receive">
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <div class="avatar-info">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive ">
+                                <div class="nickname">Admin</div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_receive">
+                                <p>
+                                    Bạn cho mình xin thông tin tài khoản của bạn với ạ? Bạn cho mình xin thông tin tài khoản của bạn với ạ?
+                                    Bạn cho mình xin thông tin tài khoản của bạn với ạ? Bạn cho mình xin thông tin tài khoản của bạn với ạ?
+                                </p>
+                                <time datetime="2019-06-06T13:00">2 phút trước</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row msg_container base_receive">
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive ">
+                            <div class="nickname">Admin</div>
+                        </div>
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_receive">
+                                <p>Bạn cho mình xin thông tin tài khoản của bạn với ạ?</p>
+                                <time datetime="2019-06-06T13:00">2 phút trước</time>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row msg_container base_sent">
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_sent">
+                                <p>
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <img src="http://arunoommen.com/wp-content/uploads/2017/01/woman_icon-icons.com_55031.png" class=" img-responsive ">
+                            <div class="nickname">ID_Khach</div>
+                        </div>
+                    </div>
+                    <div class="row msg_container base_sent">
+                        <div class="col-md-10 col-xs-10 nopadding">
+                            <div class="messages msg_sent">
+                                <p>
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                    Tại sao tôi nạp tiền rồi mà chưa nhận được trong tài khoản?
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-2 nopadding avatar">
+                            <img src="http://arunoommen.com/wp-content/uploads/2017/01/woman_icon-icons.com_55031.png" class=" img-responsive ">
+                            <div class="nickname">ID_Khach</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="btn-input" type="text" class="form-control input-sm chat_input" placeholder="Nhập tin nhắn ở đây..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary btn-sm" id="btn-chat">Gửi</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
