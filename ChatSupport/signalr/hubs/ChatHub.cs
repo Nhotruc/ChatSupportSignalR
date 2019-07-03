@@ -44,6 +44,11 @@ namespace ChatSupport.signalr.hubs
             }
         }
 
+        public HashSet<string> getCustomerIds()
+        {
+            return customerIds;
+        }
+
         public override Task OnConnected()
         {
             string token = Context.QueryString["access_token"];
