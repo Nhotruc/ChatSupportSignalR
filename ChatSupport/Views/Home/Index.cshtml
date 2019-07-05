@@ -30,6 +30,7 @@
                 if (firstTime) {
                     $('#firstTime').text(getCurrentTime())
                     firstTime = false;
+
                 }
             })
             $("#minim_chat_window").click(function () {
@@ -43,90 +44,122 @@
     <script src="~/signalr/hubs"></script>
     <!--Add script to update the page and send messages.-->
     <script type="text/javascript">
+        var idSession = '@Session["idSessionConnect"].ToString()';
+        var messages = []
 
-        $(function () {
+        function saveData() {
+            var db = JSON.stringify(messages);
+            sessionStorage.setItem('db', db);
+        }
+        function restoreData() {
+            var db = sessionStorage.getItem('db');
+            if (!db) return;
 
-            // Declare a proxy to reference the hub.
-            var chat = $.connection.chatHub;
-
-            // Create a function that the hub can call to broadcast messages.
-            chat.client.receive = function (message) {
-                console.log('receive is call')
-                addMessageAdmin(message);
-            };
-
-            var name = null;
-
-            $.connection.hub.start().done(function () {
-                function handlerSend() {
-                    if (!checkExistsName()) {
-                        return;
-                    }
-
-
-                    var message = $('#txt-input').val()
-                    if ($.trim(message) == "")
-                        return;
-                    chat.server.sendToAdmin(name, message);
-                    addMessageCustomer(message);
-                    $('#txt-input').val('').focus();
+            messages = JSON.parse(db);
+            for (var i = 0; i < messages.length; i++) {
+                var message = messages[i];
+                if (message.type == 'customer') {
+                    addMessageCustomer(message.message);
+                } else {
+                    addMessageAdmin(message.message, message.time);
                 }
-                $('#btn-chat').click(handlerSend);
+            }
+        }
 
-                $('#txt-input').on('keypress', function (e) {
-                    if (e.which === 13) {
-                        handlerSend()
-                    }
-                });
-            });
+        // Declare a proxy to reference the hub.
+        var chat = $.connection.chatHub;
 
-            function checkExistsName() {
+        // Create a function that the hub can call to broadcast messages.
+        chat.client.receive = function (message) {
+            console.log('receive is call')
+            addMessageAdmin(message, getCurrentTime());
+        };
+
+        var name = null;
+
+
+        function checkExistsName() {
+            console.log('82')
+            console.log(name)
+            if (name === null) {
+                console.log('84')
+                name = prompt('Tên của bạn là:');
                 if (name == null) {
-                    name = prompt('Tên của bạn là:');
-                    if (name == null) {
-                        alert('Tin nhắn không được gửi');
-                        return false ;
-                    }
+                    alert('Tin nhắn không được gửi');
+                    return false;
                 }
-                return true;
             }
+            return true;
+        }
 
-            function addMessageCustomer(message) {
-                $(".msg_container_base").append('<div class="row msg_container base_sent"> ' +
-                    ' <div class="col-md-10 col-xs-10 nopadding">' +
-                       ' <div class="messages msg_sent"> ' +
-                           ' <p>' + message + '</p> ' +
-                       ' </div> ' +
+        function handlerSend() {
+            console.log('94')
+            if (!checkExistsName()) {
+                return;
+            }
+            console.log('98')
+            var message = $('#txt-input').val()
+            if ($.trim(message) == "")
+                return;
+            chat.server.sendToAdmin(idSession, name, message);
+            addMessageCustomer(message);
+            $('#txt-input').val('').focus();
+        }
+
+        function connectHubCallback() {
+            restoreData();
+            $('#btn-chat').click(handlerSend);
+
+            $('#txt-input').on('keypress', function (e) {
+                if (e.which === 13) {
+                    handlerSend()
+                }
+            });
+        }
+
+
+        $.connection.hub.qs = { "idSession": idSession };
+        $.connection.hub.start().done(connectHubCallback);
+
+        function addMessageCustomer(message) {
+            messages.push({ type: 'customer', message: message })
+            $(".msg_container_base").append('<div class="row msg_container base_sent"> ' +
+                ' <div class="col-md-10 col-xs-10 nopadding">' +
+                   ' <div class="messages msg_sent"> ' +
+                       ' <p>' + message + '</p> ' +
                    ' </div> ' +
-                   ' <div class="col-md-2 col-xs-2 nopadding avatar"> ' +
-                       ' <div class="avatar-info"> ' +
+               ' </div> ' +
+               ' <div class="col-md-2 col-xs-2 nopadding avatar"> ' +
+                   ' <div class="avatar-info"> ' +
+                       ' <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive "> ' +
+                       ' <div class="nickname">' + name + '</div> ' +
+                   ' </div> ' +
+               ' </div> ' +
+            ' </div>').scrollTop(1000000);
+            saveData();
+        }
+
+        function addMessageAdmin(message, time) {
+            messages.push({ type: 'admin', message: message, time: time })
+            $(".msg_container_base").append(
+                '<div class="row msg_container base_receive"> ' +
+                    '<div class="col-md-2 col-xs-2 nopadding avatar"> ' +
+                        '<div class="avatar-info"> ' +
                            ' <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive "> ' +
-                           ' <div class="nickname">' + name + '</div> ' +
-                       ' </div> ' +
-                   ' </div> ' +
-                ' </div>').scrollTop(1000000);
-            }
-
-            function addMessageAdmin(message) {
-                $(".msg_container_base").append(
-                    '<div class="row msg_container base_receive"> ' +
-                        '<div class="col-md-2 col-xs-2 nopadding avatar"> ' +
-                            '<div class="avatar-info"> ' +
-                               ' <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive "> ' +
-                               ' <div class="nickname">Nhân viên hỗ trợ</div> ' +
-                          '  </div> ' +
+                           ' <div class="nickname">Nhân viên hỗ trợ</div> ' +
                       '  </div> ' +
-                       ' <div class="col-md-10 col-xs-10 nopadding"> ' +
-                         '   <div class="messages msg_receive"> ' +
-                             '   <p> ' +
-                                   message +
-                            '    </p> ' +
-                            '    <time>' + getCurrentTime() + '</time> ' +
-                          '  </div> ' +
+                  '  </div> ' +
+                   ' <div class="col-md-10 col-xs-10 nopadding"> ' +
+                     '   <div class="messages msg_receive"> ' +
+                         '   <p> ' +
+                               message +
+                        '    </p> ' +
+                        '    <time>' + time + '</time> ' +
                       '  </div> ' +
-                    '</div> ').scrollTop(1000000);
-            }
-        });
+                  '  </div> ' +
+                '</div> ').scrollTop(1000000);
+            saveData();
+        }
     </script>
     <div class="row chat-window col-xs-4 col-md-4 nopadding" style="display:none">
         <div class="col-xs-12 col-md-12">

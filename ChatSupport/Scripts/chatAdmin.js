@@ -9,42 +9,72 @@
     var userIds = {};
     var currentCustomerId = null;
 
-    var firstTime = true;
+    var startSave = false;
 
+    function autoSaveData() {
+        setInterval(function () {
+            if (startSave) {
+                var db = JSON.stringify(userIds);
+                localStorage.setItem('db', db);
+            }
+        }, 1000)
+    }
+
+    function updateDisplay() {
+        for (var customerId in userIds) {
+            if (!userIds.hasOwnProperty(customerId)) continue;
+
+            var message = userIds[customerId];
+
+            var messageLength = message.length;
+            addCustomer(customerId, message[messageLength - 1].name, message[messageLength - 1].message, message[messageLength - 1].time);
+        }
+    }
 
     // Declare a proxy to reference the hub.
     var chat = $.connection.chatHub;
     function restoreData() {
-        if (firstTime) {
-            var db = localStorage.getItem('db');
-            if (db) {
-                var data = JSON.parse(db);
-                chat.server.getCustomerIds().done(function (rs) {
-                    console.log(rs);
-                })
-            }
+        var db = localStorage.getItem('db');
+        if (db) {
+            var data = JSON.parse(db);
+            chat.server.getCustomerIds().done(function (rs) {
+                for (var key in data) {
+                    if (!data.hasOwnProperty(key)) continue;
+                    if (rs.indexOf(key) != -1) {
+                        userIds[key] = data[key];
+                    }
+                }
+                updateDisplay();
+                startSave = true;
+            })
         }
+        autoSaveData();
+
     }
 
-    function receive(connectId, name, message) {
+    function receive(connectId, name, message, time) {
         console.log('receive is call')
+        if (time == undefined || time == null) {
+            time = getCurrentTime();
+        }
         if (userIds.hasOwnProperty(connectId)) {
-            userIds[connectId].push({ type: 'customer', name: name, message: message, time: getCurrentTime() });
+            userIds[connectId].push({ type: 'customer', name: name, message: message, time: time });
             $('div[data-customer-id="' + connectId + '"] p').text(message);
 
             if (currentCustomerId == null) {
 
             }
             if (currentCustomerId == connectId) {
-                addMessageCustomer(message,getCurrentTime());
+                addMessageCustomer(message, time);
             }
         } else {
-            userIds[connectId] = [{ type: 'customer', name: name, message: message, time: getCurrentTime() }];
-            addCustomer(connectId, name, message,getCurrentTime());
+            userIds[connectId] = [{ type: 'customer', name: name, message: message, time: time }];
+            addCustomer(connectId, name, message, time);
         }
     }
 
     function remove(connectId) {
+        return;
         $('div[data-customer-id="' + connectId + '"]').remove();
         delete userIds[connectId];
         if (currentCustomerId == connectId) {
@@ -61,6 +91,7 @@
 
         $.connection.hub.start().done(function () {
             console.log("ket noi xong")
+            restoreData();
         });
     }
     function authenticateUser(credentials) {
@@ -91,7 +122,7 @@
                 $('#myModal').modal('hide')
                 auth = result['access_token'];
                 connectSignalR(auth);
-                restoreData();
+
             },
 
             error: function (result) {
@@ -122,7 +153,7 @@
                 write_msg.val('');
                 chat.server.sendToCustomer(currentCustomerId, message);
                 userIds[currentCustomerId].push({ type: 'admin', name: 'admin', message: message, time: getCurrentTime() })
-                addMessageAdmin(message,getCurrentTime())
+                addMessageAdmin(message, getCurrentTime())
             }
         }
     }
@@ -138,6 +169,8 @@
 
 
     function addCustomer(connectId, name, message, time) {
+        if ($('div[data-customer-id="' + connectId + '"]').length != 0)
+            return;
         $(".inbox_chat").append('<div data-customer-id="' + connectId + '" class="chat_list"> ' +
                     '  <div class="chat_people"> ' +
                     '      <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div> ' +
@@ -156,13 +189,14 @@
             if (temp != currentCustomerId) {
                 $('.msg_history').empty();
                 currentCustomerId = temp;
+                $('#customer-name').text(userIds[currentCustomerId][0].name);
                 var listMesss = userIds[connectId];
                 for (var i = 0; i < listMesss.length; i++) {
                     mess = listMesss[i];
                     if (mess.type === 'customer') {
-                        addMessageCustomer(mess.message,mess.time);
+                        addMessageCustomer(mess.message, mess.time);
                     } else {
-                        addMessageAdmin(mess.message,mess.time);
+                        addMessageAdmin(mess.message, mess.time);
                     }
                 }
             }
@@ -170,23 +204,24 @@
 
     }
 
-    function addMessageCustomer(message,time) {
+    function addMessageCustomer(message, time) {
         $(".msg_history").append('<div class="incoming_msg"> ' +
-                           ' <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div> ' +
+                            
+                           //' <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div> ' +
                            ' <div class="received_msg"> ' +
                            '     <div class="received_withd_msg"> ' +
                            '         <p>' + message + '</p> ' +
-                          '          <span class="time_date">'+ time +'</span> ' +
+                          '          <span class="time_date">' + time + '</span> ' +
                            '     </div> ' +
                           '  </div> ' +
                        ' </div>').scrollTop(1000000);
     }
 
-    function addMessageAdmin(message,time) {
+    function addMessageAdmin(message, time) {
         $(".msg_history").append('<div class="outgoing_msg"> ' +
                            ' <div class="sent_msg"> ' +
                            '     <p>' + message + '</p> ' +
-                          '      <span class="time_date">'+time+'</span> ' +
+                          '      <span class="time_date">' + time + '</span> ' +
                           '  </div> ' +
                        ' </div>').scrollTop(1000000);
     }

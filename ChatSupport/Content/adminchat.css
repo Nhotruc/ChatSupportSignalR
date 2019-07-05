@@ -9,7 +9,8 @@ img{
   background: #f8f8f8 none repeat scroll 0 0;
   float: left;
   overflow: hidden;
-  width: 40%; border-right:1px solid #c4c4c4;
+  width: 30%; 
+  border-right:1px solid #c4c4c4;
 }
 .inbox_msg {
   border: 1px solid #c4c4c4;
@@ -92,7 +93,7 @@ img{
   padding: 18px 16px 10px;
 }
 .inbox_chat { 
-    height: 550px; 
+    height: 85vh; 
     overflow-y: scroll;
 }
 
@@ -131,7 +132,7 @@ img{
 .mesgs {
   float: left;
   padding: 30px 15px 0 25px;
-  width: 60%;
+  width: 70%;
 }
 
  .sent_msg p {
@@ -176,9 +177,9 @@ img{
   width: 33px;
 }
 .messaging { 
-    padding: 0 0 50px 0;
+    
 }
 .msg_history {
-  height: 516px;
+  height: calc(100vh - 200px);
   overflow-y: auto;
 }

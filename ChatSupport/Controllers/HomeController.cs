@@ -11,6 +11,8 @@ namespace OAuth2.Controllers
         [AllowAnonymous]
         public ActionResult Index()
         {
+            if(Session["idSessionConnect"] == null)
+                Session["idSessionConnect"] = Guid.NewGuid();
             return View();
         }
     }

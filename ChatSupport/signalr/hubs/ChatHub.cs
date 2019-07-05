@@ -11,79 +11,183 @@ namespace ChatSupport.signalr.hubs
 {
     public class ChatHub : Hub
     {
-        private static string adminId="";
+        private static string adminId = "";
 
-        private static HashSet<string> customerIds = new HashSet<string>();
-        public void sendToAdmin(string name,string message)
+        private static Dictionary<string, List<Message>> queueMessage = new Dictionary<string, List<Message>>();
+        //private static List<UserConnect> listUserConnect = new List<UserConnect>();
+        private static Dictionary<string, HashSet<string>> customerSessionIds = new Dictionary<string, HashSet<string>>();
+
+        public void sendToAdmin(string idSession, string name, string message)
         {
             Debug.WriteLine("sendToAdmin is call");
             Debug.WriteLine("Adminid " + adminId);
             if (string.IsNullOrEmpty(adminId))
-                Debug.WriteLine("ADmim id bi null");
+            {
+                List<Message> messages = null;
+                if (queueMessage.ContainsKey(idSession))
+                {
+                    messages = queueMessage[idSession];
+                }
+                else
+                {
+                    messages = new List<Message>();
+                    queueMessage.Add(idSession, messages);
+                }
+                messages.Add(new Message { type = "customer", name = name, message = message, time = DateTime.Now.ToString("h:mm") });
+            }
             else
             {
                 Debug.WriteLine("Admin id k null");
-            }
-            if (!string.IsNullOrEmpty(adminId))
-            {
-                Clients.Client(adminId).receive(Context.ConnectionId,name,message);
+                Clients.Client(adminId).receive(idSession, name, message);
             }
         }
 
-        public void sendToCustomer(string connectId,string message)
+        public void sendToCustomer(string idSession, string message)
         {
             Debug.WriteLine("sendToCustomer is call");
-            if (customerIds.Contains(connectId))
-            {
-                Debug.WriteLine("vo 38"+connectId+"|"+message);
+            //var listDrive = listUserConnect.Where(p => p.IDSession == idSession).ToList();
+            //foreach (var item in listDrive)
+            //{
+            //    Clients.Client(item.IDConnection).receive(message);
+            //}
 
-                Clients.Client(connectId).receive(message);
-            } else
+            HashSet<string> connectIds = customerSessionIds[idSession];
+            foreach(var connectId in connectIds)
             {
-                Debug.WriteLine("vo 43");
+                Clients.Client(connectId).receive(message);
+            }
+
+            //if (customerIds.Contains(connectId))
+            //{
+            //  //  Debug.WriteLine("vo 38" + connectId + "|" + message);
+
+            //    Clients.Client(connectId).receive(message);
+            //}
+            //else
+            //{
+            //  //  Debug.WriteLine("vo 43");
+            //}
+        }
+
+        public List<string> getCustomerSessionIds()
+        {
+            return customerSessionIds.Keys.ToList();
+        }
+        public void Connect(string idSession)
+        {
+            //var check = false;
+            //if (idSession != null)
+            //{
+            //    if (listUserConnect.Any(p => p.IDSession == idSession))
+            //    {
+            //        var curSession = listUserConnect.FirstOrDefault(p => p.IDSession == idSession);
+            //        curSession.IDConnection = Context.ConnectionId;
+            //        check = true;
+            //        Clients.All.connect("Khôi phục kết nối id: " + idSession);
+            //    }
+            //}
+
+            //if (!check)
+            //{
+            //    listUserConnect.Add(new UserConnect { IDSession = idSession, IDConnection = Context.ConnectionId });
+            //    Clients.All.connect("Kết nối thành công id: " + idSession);
+            //}
+            if (string.IsNullOrEmpty(idSession)) return;
+
+            if (customerSessionIds.ContainsKey(idSession))
+            {
+                customerSessionIds[idSession].Add(Context.ConnectionId);
+            }
+            else
+            {
+                HashSet<string> connectIds = new HashSet<string>();
+                connectIds.Add(Context.ConnectionId);
+                customerSessionIds.Add(idSession, connectIds);
             }
         }
-
-        public HashSet<string> getCustomerIds()
-        {
-            return customerIds;
-        }
-
         public override Task OnConnected()
         {
             string token = Context.QueryString["access_token"];
             if (string.IsNullOrEmpty(token))
             {
                 Debug.WriteLine("Customer is connect");
-                customerIds.Add(Context.ConnectionId);
-            } else
+                string idSession = Context.QueryString["idSession"];
+                if (!string.IsNullOrEmpty(idSession))
+                {
+                    if (customerSessionIds.ContainsKey(idSession))
+                    {
+                        customerSessionIds[idSession].Add(Context.ConnectionId);
+                    }
+                    else
+                    {
+                        HashSet<string> connectIds = new HashSet<string>();
+                        connectIds.Add(Context.ConnectionId);
+                        customerSessionIds.Add(idSession, connectIds);
+                    }
+                }
+            }
+            else
             {
                 adminId = Context.ConnectionId;
-                Debug.WriteLine("Admin is connect "+adminId);
+                Debug.WriteLine("Admin is connect " + adminId);
+                foreach (KeyValuePair<string, List<Message>> item in queueMessage)
+                {
+                    string customerSessionId = item.Key;
+                    List<Message> messages = item.Value;
+                    foreach (var message in messages)
+                    {
+                        Clients.Client(adminId).receive(customerSessionId, message.name, message.message, message.time);
+                    }
+                }
+                queueMessage.Clear();
+
             }
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            if (!string.IsNullOrEmpty(adminId))
+            string idSession = Context.QueryString["idSession"];
+            if (!string.IsNullOrEmpty(idSession))
             {
-                Clients.Client(adminId).remove(Context.ConnectionId);
+                HashSet<string> connectIds = customerSessionIds[idSession];
+                connectIds.Remove(Context.ConnectionId);
+                if (!string.IsNullOrEmpty(adminId)&&connectIds.Count==0)
+                {
+                    Clients.Client(adminId).remove(idSession);
+                }
             }
-            customerIds.Remove(Context.ConnectionId);
+
             return base.OnDisconnected(stopCalled);
         }
 
         public override Task OnReconnected()
         {
-            if (!customerIds.Contains(Context.ConnectionId))
+            string idSession = Context.QueryString["idSession"];
+            if (!string.IsNullOrEmpty(idSession))
             {
-                customerIds.Add(Context.ConnectionId);
+                if (customerSessionIds.ContainsKey(idSession))
+                {
+                    customerSessionIds[idSession].Add(Context.ConnectionId);
+                }
+                else
+                {
+                    HashSet<string> connectIds = new HashSet<string>();
+                    connectIds.Add(Context.ConnectionId);
+                    customerSessionIds.Add(idSession, connectIds);
+                }
             }
-
             return base.OnReconnected();
         }
 
+    }
+
+    public class Message
+    {
+        public string type { get; set; }
+        public string name { get; set; }
+        public string message { get; set; }
+        public string time { get; set; }
     }
 
 }
