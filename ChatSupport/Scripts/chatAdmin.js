@@ -74,7 +74,6 @@
     }
 
     function remove(connectId) {
-        return;
         $('div[data-customer-id="' + connectId + '"]').remove();
         delete userIds[connectId];
         if (currentCustomerId == connectId) {
