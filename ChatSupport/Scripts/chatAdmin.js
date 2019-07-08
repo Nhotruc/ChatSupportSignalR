@@ -15,7 +15,7 @@
         setInterval(function () {
             if (startSave) {
                 var db = JSON.stringify(userIds);
-                localStorage.setItem('db', db);
+                localStorage.setItem('adminDb', db);
             }
         }, 1000)
     }
@@ -34,10 +34,10 @@
     // Declare a proxy to reference the hub.
     var chat = $.connection.chatHub;
     function restoreData() {
-        var db = localStorage.getItem('db');
+        var db = localStorage.getItem('adminDb');
         if (db) {
             var data = JSON.parse(db);
-            chat.server.getCustomerIds().done(function (rs) {
+            chat.server.getCustomerSessionIds().done(function (rs) {
                 for (var key in data) {
                     if (!data.hasOwnProperty(key)) continue;
                     if (rs.indexOf(key) != -1) {
@@ -45,10 +45,10 @@
                     }
                 }
                 updateDisplay();
-                startSave = true;
             })
         }
-        autoSaveData();
+        startSave = true;
+       
 
     }
 
@@ -59,7 +59,7 @@
         }
         if (userIds.hasOwnProperty(connectId)) {
             userIds[connectId].push({ type: 'customer', name: name, message: message, time: time });
-            $('div[data-customer-id="' + connectId + '"] p').text(message);
+            $('div[data-customer-id="' + connectId + '"] p').text("");
 
             if (currentCustomerId == null) {
 
@@ -74,11 +74,12 @@
     }
 
     function remove(connectId) {
-        $('div[data-customer-id="' + connectId + '"]').remove();
-        delete userIds[connectId];
-        if (currentCustomerId == connectId) {
-            $('.msg_history').empty();
-        }
+        //$('div[data-customer-id="' + connectId + '"]').remove();
+        //delete userIds[connectId];
+       // if (currentCustomerId == connectId) {
+       //     $('.msg_history').empty();
+        //}
+        $('div[data-customer-id="' + connectId + '"]').append('<p class="msg" ><strong>Mất kết nối</strong></p>');
     }
     function connectSignalR(auth) {
         var chat = $.connection.chatHub;
@@ -91,6 +92,7 @@
         $.connection.hub.start().done(function () {
             console.log("ket noi xong")
             restoreData();
+            autoSaveData();
         });
     }
     function authenticateUser(credentials) {

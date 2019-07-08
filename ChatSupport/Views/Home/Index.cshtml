@@ -16,12 +16,6 @@
         <button id="openchat-button" class="btn btn-info"><span class="far fa-comment-dots"></span> </button>
     </div>
     <script>
-        function getCurrentTime() {
-            var date = new Date();
-            //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-            var currentTimeFormat = date.getHours() + 'h' + date.getMinutes()
-            return currentTimeFormat;
-        }
         $(document).ready(function () {
             var firtTime = true;
             $("#openchat-button").click(function () {
@@ -45,6 +39,12 @@
     <!--Add script to update the page and send messages.-->
     <script type="text/javascript">
         var messages = [];
+        function getCurrentTime() {
+            var date = new Date();
+            //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            var currentTimeFormat = date.getHours() + 'h' + date.getMinutes()
+            return currentTimeFormat;
+        }
         $(function () {
             var idSession = '@Session["idSessionConnect"].ToString()';
             var startSave = false;
@@ -53,7 +53,7 @@
             function saveData() {
                 setInterval(function () {
                     if (!name) return;
-
+                    localStorage.setItem('timeUpdate',new Date().getTime());
                     localStorage.setItem('name', name);
                     var db = JSON.stringify(messages);
                     localStorage.setItem('db', db);
@@ -61,8 +61,16 @@
                 },1000)
             }
             function restoreData() {
+                var time = localStorage.getItem('timeUpdate');
                 var db = localStorage.getItem('db');
-                if (!db) return;
+                if (!db || !time) return;
+
+                var timeDiff = new Date().getTime() - time;
+                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                if (daysDiff > 0) {
+                    localStorage.removeItem('db');
+                    return;
+                }
 
                 name = localStorage.getItem('name');
 
@@ -82,9 +90,13 @@
             var chat = $.connection.chatHub;
 
             // Create a function that the hub can call to broadcast messages.
-            chat.client.receive = function (message) {
+            chat.client.receive = function (type, message) {
                 console.log('receive is call')
-                addMessageAdmin(message, getCurrentTime());
+                console.log('type'+type+' message'+message)
+                if (type == 'admin')
+                    addMessageAdmin(message, getCurrentTime());
+                else
+                    addMessageCustomer(message);
             };
 
             
@@ -95,7 +107,11 @@
                 console.log(name)
                 if (name == null) {
                     console.log('84')
-                    name = prompt('Tên của bạn là:');
+                    var temp = localStorage.getItem('name');
+                    if (temp != null)
+                        name = temp;
+                    else 
+                        name = prompt('Tên của bạn là:');
                     if (name == null) {
                         alert('Tin nhắn không được gửi');
                         return false;

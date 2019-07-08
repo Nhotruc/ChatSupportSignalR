@@ -21,6 +21,12 @@ namespace ChatSupport.signalr.hubs
         {
             Debug.WriteLine("sendToAdmin is call");
             Debug.WriteLine("Adminid " + adminId);
+            HashSet<string> connectIds = customerSessionIds[idSession];
+            foreach (var connectId in connectIds)
+            {
+                if (connectId != Context.ConnectionId)
+                    Clients.Client(connectId).receive("customer", message);
+            }
             if (string.IsNullOrEmpty(adminId))
             {
                 List<Message> messages = null;
@@ -39,6 +45,7 @@ namespace ChatSupport.signalr.hubs
             {
                 Debug.WriteLine("Admin id k null");
                 Clients.Client(adminId).receive(idSession, name, message);
+
             }
         }
 
@@ -52,9 +59,9 @@ namespace ChatSupport.signalr.hubs
             //}
 
             HashSet<string> connectIds = customerSessionIds[idSession];
-            foreach(var connectId in connectIds)
+            foreach (var connectId in connectIds)
             {
-                Clients.Client(connectId).receive(message);
+                Clients.Client(connectId).receive("admin", message);
             }
 
             //if (customerIds.Contains(connectId))
@@ -152,7 +159,7 @@ namespace ChatSupport.signalr.hubs
             {
                 HashSet<string> connectIds = customerSessionIds[idSession];
                 connectIds.Remove(Context.ConnectionId);
-                if (!string.IsNullOrEmpty(adminId)&&connectIds.Count==0)
+                if (!string.IsNullOrEmpty(adminId) && connectIds.Count == 0)
                 {
                     Clients.Client(adminId).remove(idSession);
                 }
