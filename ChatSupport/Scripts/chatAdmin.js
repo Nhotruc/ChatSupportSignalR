@@ -83,7 +83,7 @@
        // if (currentCustomerId == connectId) {
        //     $('.msg_history').empty();
         //}
-        $('div[data-customer-id="' + connectId + '"]').append('<span class="disconnect-notify" >Người dùng mất kết nối</span>');
+        $('div[data-customer-id="' + connectId + '"] .disconnect-notify').text('Người dùng mất kết nối');
     }
 
     function remove(connectId) {
@@ -167,6 +167,11 @@
             var write_msg = $('.write_msg');
             var message = write_msg.val();
             if (!($.trim(message) == '')) {
+                if ($('div[data-customer-id="' + currentCustomerId + '"] .disconnect-notify').text() == 'Người dùng mất kết nối') {
+                    alert('Người dùng này đã mất kết nối');
+                    return;
+                }
+                 
                 write_msg.val('');
                 chat.server.sendToCustomer(currentCustomerId, message);
                 userIds[currentCustomerId].push({ type: 'admin', name: 'admin', message: message, time: getCurrentTime() })
@@ -197,7 +202,8 @@
                           message +
                     '       </p>' +
                     '    </div> ' +
-                    '  </div>' +
+                    '  </div> ' +
+                    ' <span class="disconnect-notify" ></span>' +
                     '  </div>');
 
         $('.inbox_chat .chat_list').click(function () {

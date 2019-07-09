@@ -52,11 +52,7 @@ namespace ChatSupport.signalr.hubs
         public void sendToCustomer(string idSession, string message)
         {
             Debug.WriteLine("sendToCustomer is call");
-            //var listDrive = listUserConnect.Where(p => p.IDSession == idSession).ToList();
-            //foreach (var item in listDrive)
-            //{
-            //    Clients.Client(item.IDConnection).receive(message);
-            //}
+            if (!customerSessionIds.ContainsKey(idSession)) return;
 
             HashSet<string> connectIds = customerSessionIds[idSession];
             foreach (var connectId in connectIds)
