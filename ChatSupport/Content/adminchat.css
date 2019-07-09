@@ -92,13 +92,18 @@ img{
   margin: 0;
   padding: 18px 16px 10px;
 }
+.chat_list:hover {
+    background-color: aliceblue;
+    font-weight: bold;
+}
+
 .inbox_chat { 
     height: 85vh; 
     overflow-y: scroll;
 }
 
-.active_chat{ 
-    background:#ebebeb;
+.active_chat {
+    background-color: rgb(207, 227, 253);
 }
 
 .incoming_msg_img {
@@ -182,4 +187,25 @@ img{
 .msg_history {
   height: calc(100vh - 200px);
   overflow-y: auto;
+}
+
+.disconnect-notify-inchatbox {
+    color: red;
+    text-align: center;
+    background-color: mistyrose;
+    margin-bottom: 10px;
+}
+
+
+
+.reconnect-notify-inchatbox {
+    color: forestgreen;
+    text-align: center;
+    background-color: honeydew;
+    margin-bottom: 10px;
+}
+
+.disconnect-notify{
+    color: red;
+    background-color: mistyrose;
 }

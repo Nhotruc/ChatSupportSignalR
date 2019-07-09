@@ -1,12 +1,10 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
+﻿
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css'>
-    <link href="~/Content/css.css" rel="stylesheet">
+    <link href="~/Content/clientchat.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
@@ -42,7 +40,10 @@
         function getCurrentTime() {
             var date = new Date();
             //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-            var currentTimeFormat = date.getHours() + 'h' + date.getMinutes()
+            var minute = date.getMinutes();
+            if (minute < 10)
+                minute = '0' + minute.toString();
+            var currentTimeFormat = date.getHours() + 'h' + date.getMinutes() // 8h08
             return currentTimeFormat;
         }
         $(function () {
@@ -78,6 +79,7 @@
             function restoreData() {
                 var savedIdSession = localStorage.getItem('idSession');
                 if (savedIdSession != null && savedIdSession != idSession) {
+                    chat.server.removeIdSession(savedIdSession);
                     localStorage.clear();
                 }
                 //var time = localStorage.getItem('timeUpdate');
@@ -173,7 +175,7 @@
                     '<div class="row msg_container base_receive"> ' +
                         '<div class="col-md-2 col-xs-2 nopadding avatar"> ' +
                             '<div class="avatar-info"> ' +
-                               ' <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive "> ' +
+                               ' <img src="https://lh3.googleusercontent.com/goQ1q9Mn2DmGj8Wjz26ViozumJdVz0XVDkrN7u4aLHZASHEcZk9-pGBzlHo_pyl3ZSA" class=" img-responsive "> ' +
                                ' <div class="nickname">Nhân viên hỗ trợ</div> ' +
                           '  </div> ' +
                       '  </div> ' +
@@ -208,8 +210,8 @@
                     <div class="row msg_container base_receive">
                         <div class="col-md-2 col-xs-2 nopadding avatar">
                             <div class="avatar-info">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1qvejRMnu6IgbYSK0ZrgiBhSOFi55mnu50CZWLllR1nPF_vqw" class=" img-responsive ">
-                                <div class="nickname">Nhân viên hỗ trợ</div>
+                                <img src="https://lh3.googleusercontent.com/goQ1q9Mn2DmGj8Wjz26ViozumJdVz0XVDkrN7u4aLHZASHEcZk9-pGBzlHo_pyl3ZSA" class="img-responsive">
+                                <div class="nickname">PacificGo</div>
                             </div>
                         </div>
                         <div class="col-md-10 col-xs-10 nopadding">

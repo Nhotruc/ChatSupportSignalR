@@ -2,7 +2,10 @@
     function getCurrentTime() {
         var date = new Date();
         //var str = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-        var currentTimeFormat = date.getHours() + 'h' + date.getMinutes()
+        var minute = date.getMinutes();
+        if (minute < 10)
+            minute = '0' + minute.toString();
+        var currentTimeFormat = date.getHours() + 'h' + date.getMinutes() // 8h08
         return currentTimeFormat;
     }
 
@@ -59,7 +62,8 @@
         }
         if (userIds.hasOwnProperty(connectId)) {
             userIds[connectId].push({ type: 'customer', name: name, message: message, time: time });
-            $('div[data-customer-id="' + connectId + '"] p').text("");
+            $('div[data-customer-id="' + connectId + '"] .disconnect-notify').text("");
+            $('div[data-customer-id="' + connectId + '"] .chat_ib p').text(message);
 
             if (currentCustomerId == null) {
 
@@ -79,7 +83,7 @@
        // if (currentCustomerId == connectId) {
        //     $('.msg_history').empty();
         //}
-        $('div[data-customer-id="' + connectId + '"]').append('<p class="msg" ><strong>Mất kết nối</strong></p>');
+        $('div[data-customer-id="' + connectId + '"]').append('<span class="disconnect-notify" >Người dùng mất kết nối</span>');
     }
 
     function remove(connectId) {
@@ -87,11 +91,15 @@
         delete userIds[connectId];
          if (currentCustomerId == connectId) {
              $('.msg_history').empty();
+             currentCustomerId = null;
+             $('#customer-name').text('');
         }
     }
     function connectSignalR(auth) {
         var chat = $.connection.chatHub;
         chat.client.receive = receive
+
+        chat.client.disconnect = disconnect;
 
         chat.client.remove = remove;
 

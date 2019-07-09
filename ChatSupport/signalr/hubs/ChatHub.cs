@@ -63,22 +63,16 @@ namespace ChatSupport.signalr.hubs
             {
                 Clients.Client(connectId).receive("admin", message);
             }
-
-            //if (customerIds.Contains(connectId))
-            //{
-            //  //  Debug.WriteLine("vo 38" + connectId + "|" + message);
-
-            //    Clients.Client(connectId).receive(message);
-            //}
-            //else
-            //{
-            //  //  Debug.WriteLine("vo 43");
-            //}
         }
 
         public void removeIdSession(string idSession)
         {
-            Clients.Client(idSession).remove();
+            Debug.WriteLine("remove Id session is call");
+            customerSessionIds.Remove(idSession);
+            if (!string.IsNullOrEmpty(adminId))
+            {
+                Clients.Client(adminId).remove(idSession);
+            }
         }
 
         public List<string> getCustomerSessionIds()
@@ -87,23 +81,6 @@ namespace ChatSupport.signalr.hubs
         }
         public void Connect(string idSession)
         {
-            //var check = false;
-            //if (idSession != null)
-            //{
-            //    if (listUserConnect.Any(p => p.IDSession == idSession))
-            //    {
-            //        var curSession = listUserConnect.FirstOrDefault(p => p.IDSession == idSession);
-            //        curSession.IDConnection = Context.ConnectionId;
-            //        check = true;
-            //        Clients.All.connect("Khôi phục kết nối id: " + idSession);
-            //    }
-            //}
-
-            //if (!check)
-            //{
-            //    listUserConnect.Add(new UserConnect { IDSession = idSession, IDConnection = Context.ConnectionId });
-            //    Clients.All.connect("Kết nối thành công id: " + idSession);
-            //}
             if (string.IsNullOrEmpty(idSession)) return;
 
             if (customerSessionIds.ContainsKey(idSession))
@@ -164,9 +141,13 @@ namespace ChatSupport.signalr.hubs
             {
                 HashSet<string> connectIds = customerSessionIds[idSession];
                 connectIds.Remove(Context.ConnectionId);
-                if (!string.IsNullOrEmpty(adminId) && connectIds.Count == 0)
+                if(connectIds.Count == 0)
                 {
-                    Clients.Client(adminId).disconnect(idSession);
+                    if (!string.IsNullOrEmpty(adminId) )
+                    {
+                        Clients.Client(adminId).disconnect(idSession);
+                    }
+                    customerSessionIds.Remove(idSession);
                 }
             }
 
