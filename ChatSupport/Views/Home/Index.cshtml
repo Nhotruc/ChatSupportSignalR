@@ -50,27 +50,48 @@
             var startSave = false;
             var name = null;
 
+
+            // Declare a proxy to reference the hub.
+            var chat = $.connection.chatHub;
+
+            // Create a function that the hub can call to broadcast messages.
+            chat.client.receive = function (type, message) {
+                console.log('receive is call')
+                console.log('type' + type + ' message' + message)
+                if (type == 'admin')
+                    addMessageAdmin(message, getCurrentTime());
+                else
+                    addMessageCustomer(message);
+            };
+
             function saveData() {
+                localStorage.setItem('idSession',idSession);
                 setInterval(function () {
                     if (!name) return;
-                    localStorage.setItem('timeUpdate',new Date().getTime());
+                    //localStorage.setItem('timeUpdate', new Date().getTime());
                     localStorage.setItem('name', name);
                     var db = JSON.stringify(messages);
                     localStorage.setItem('db', db);
-                    
-                },1000)
+
+                }, 1000)
             }
             function restoreData() {
-                var time = localStorage.getItem('timeUpdate');
-                var db = localStorage.getItem('db');
-                if (!db || !time) return;
-
-                var timeDiff = new Date().getTime() - time;
-                var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                if (daysDiff > 0) {
-                    localStorage.removeItem('db');
-                    return;
+                var savedIdSession = localStorage.getItem('idSession');
+                if (savedIdSession != null && savedIdSession != idSession) {
+                    localStorage.clear();
                 }
+                //var time = localStorage.getItem('timeUpdate');
+                var db = localStorage.getItem('db');
+                if (db == null)
+                    return;
+                //if (!db || !time) return;
+
+                //var timeDiff = new Date().getTime() - time;
+                //var daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                //if (daysDiff > 0) {
+                //    localStorage.removeItem('db');
+                //    return;
+                //}
 
                 name = localStorage.getItem('name');
 
@@ -86,31 +107,13 @@
                 }
             }
 
-            // Declare a proxy to reference the hub.
-            var chat = $.connection.chatHub;
-
-            // Create a function that the hub can call to broadcast messages.
-            chat.client.receive = function (type, message) {
-                console.log('receive is call')
-                console.log('type'+type+' message'+message)
-                if (type == 'admin')
-                    addMessageAdmin(message, getCurrentTime());
-                else
-                    addMessageCustomer(message);
-            };
-
-            
-
 
             function checkExistsName() {
-                console.log('82')
-                console.log(name)
                 if (name == null) {
-                    console.log('84')
                     var temp = localStorage.getItem('name');
                     if (temp != null)
                         name = temp;
-                    else 
+                    else
                         name = prompt('Tên của bạn là:');
                     if (name == null) {
                         alert('Tin nhắn không được gửi');
@@ -121,11 +124,9 @@
             }
 
             function handlerSend() {
-                console.log('94')
                 if (!checkExistsName()) {
                     return;
                 }
-                console.log('98')
                 var message = $('#txt-input').val()
                 if ($.trim(message) == "")
                     return;
@@ -140,7 +141,7 @@
                 $('#btn-chat').click(handlerSend);
 
                 $('#txt-input').on('keypress', function (e) {
-                    
+
                     if (e.which === 13) {
                         handlerSend()
                     }

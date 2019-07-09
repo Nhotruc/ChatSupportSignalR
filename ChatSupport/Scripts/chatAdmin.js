@@ -73,13 +73,21 @@
         }
     }
 
-    function remove(connectId) {
+    function disconnect(connectId) {
         //$('div[data-customer-id="' + connectId + '"]').remove();
         //delete userIds[connectId];
        // if (currentCustomerId == connectId) {
        //     $('.msg_history').empty();
         //}
         $('div[data-customer-id="' + connectId + '"]').append('<p class="msg" ><strong>Mất kết nối</strong></p>');
+    }
+
+    function remove(connectId) {
+        $('div[data-customer-id="' + connectId + '"]').remove();
+        delete userIds[connectId];
+         if (currentCustomerId == connectId) {
+             $('.msg_history').empty();
+        }
     }
     function connectSignalR(auth) {
         var chat = $.connection.chatHub;

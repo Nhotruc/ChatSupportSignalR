@@ -76,6 +76,11 @@ namespace ChatSupport.signalr.hubs
             //}
         }
 
+        public void removeIdSession(string idSession)
+        {
+            Clients.Client(idSession).remove();
+        }
+
         public List<string> getCustomerSessionIds()
         {
             return customerSessionIds.Keys.ToList();
@@ -161,7 +166,7 @@ namespace ChatSupport.signalr.hubs
                 connectIds.Remove(Context.ConnectionId);
                 if (!string.IsNullOrEmpty(adminId) && connectIds.Count == 0)
                 {
-                    Clients.Client(adminId).remove(idSession);
+                    Clients.Client(adminId).disconnect(idSession);
                 }
             }
 
