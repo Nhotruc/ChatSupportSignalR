@@ -83,6 +83,9 @@ img{
   width: 88%;
 }
 
+.chat_ib > p{
+    max-height : 5%;
+}
 .chat_people{ 
     overflow:hidden; 
     clear:both;
@@ -136,7 +139,7 @@ img{
 }
 .mesgs {
   float: left;
-  padding: 30px 15px 0 25px;
+  padding: 5px 15px 0px 25px;
   width: 70%;
 }
 
@@ -185,7 +188,7 @@ img{
     
 }
 .msg_history {
-  height: calc(100vh - 200px);
+  height: calc(100vh - 250px);
   overflow-y: auto;
 }
 
@@ -196,8 +199,6 @@ img{
     margin-bottom: 10px;
 }
 
-
-
 .reconnect-notify-inchatbox {
     color: forestgreen;
     text-align: center;
@@ -207,5 +208,4 @@ img{
 
 .disconnect-notify{
     color: red;
-    background-color: mistyrose;
 }

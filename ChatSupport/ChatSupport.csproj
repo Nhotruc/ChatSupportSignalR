@@ -237,7 +237,6 @@
     <Compile Include="provider\QueryStringOAuthBearerProvider.cs" />
     <Compile Include="Service\UserService.cs" />
     <Compile Include="signalr\hubs\ChatHub.cs" />
-    <Compile Include="signalr\hubs\UserConnect.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

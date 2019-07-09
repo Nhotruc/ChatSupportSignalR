@@ -167,12 +167,12 @@
             var write_msg = $('.write_msg');
             var message = write_msg.val();
             if (!($.trim(message) == '')) {
+                write_msg.val('');
                 if ($('div[data-customer-id="' + currentCustomerId + '"] .disconnect-notify').text() == 'Người dùng mất kết nối') {
                     alert('Người dùng này đã mất kết nối');
                     return;
                 }
                  
-                write_msg.val('');
                 chat.server.sendToCustomer(currentCustomerId, message);
                 userIds[currentCustomerId].push({ type: 'admin', name: 'admin', message: message, time: getCurrentTime() })
                 addMessageAdmin(message, getCurrentTime())

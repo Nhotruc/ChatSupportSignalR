@@ -133,13 +133,13 @@ namespace ChatSupport.signalr.hubs
         public override Task OnDisconnected(bool stopCalled)
         {
             string idSession = Context.QueryString["idSession"];
-            if (!string.IsNullOrEmpty(idSession))
+            if (!string.IsNullOrEmpty(idSession) && customerSessionIds.ContainsKey(idSession))
             {
                 HashSet<string> connectIds = customerSessionIds[idSession];
                 connectIds.Remove(Context.ConnectionId);
-                if(connectIds.Count == 0)
+                if (connectIds.Count == 0)
                 {
-                    if (!string.IsNullOrEmpty(adminId) )
+                    if (!string.IsNullOrEmpty(adminId))
                     {
                         Clients.Client(adminId).disconnect(idSession);
                     }
