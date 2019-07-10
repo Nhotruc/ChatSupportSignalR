@@ -14,6 +14,7 @@
 
     var startSave = false;
 
+    // auto save data in once 1s
     function autoSaveData() {
         setInterval(function () {
             if (startSave) {
@@ -23,6 +24,7 @@
         }, 1000)
     }
 
+    // update gui from userIds object
     function updateDisplay() {
         for (var customerId in userIds) {
             if (!userIds.hasOwnProperty(customerId)) continue;
@@ -55,6 +57,7 @@
 
     }
 
+    // receive message from server 
     function receive(connectId, name, message, time) {
         console.log('receive is call')
         if (time == undefined || time == null) {
@@ -77,15 +80,12 @@
         }
     }
 
+    // notify customer disconnect
     function disconnect(connectId) {
-        //$('div[data-customer-id="' + connectId + '"]').remove();
-        //delete userIds[connectId];
-       // if (currentCustomerId == connectId) {
-       //     $('.msg_history').empty();
-        //}
         $('div[data-customer-id="' + connectId + '"] .disconnect-notify').text('Người dùng mất kết nối');
     }
 
+    // remove customer in left side
     function remove(connectId) {
         $('div[data-customer-id="' + connectId + '"]').remove();
         delete userIds[connectId];

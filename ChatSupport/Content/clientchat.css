@@ -23,7 +23,7 @@
     position: absolute;
     bottom: 2px;
     right: 2px;
-    min-width: 400px;
+    min-width: 320px;
 }
 .msg_container_base{
   background: #e5e5e5;
@@ -94,21 +94,35 @@ img {
 
 @media screen and (max-device-width: 768px) and (orientation: portrait) {
     .msg_container_base {
-        max-height: 90vh;
-        height: 90vh;
+        max-height: calc(100vh - 126px);
+        height: 100vh;
     }
 
-    .chat-window {
+    .chat-window{
         width: 100vw;
+        right: 0;
+        top: 0;
+    }
+    
+    .chat-window > div {
+        padding: 0;
+        margin: 0;
     }
 }
 @media screen and (max-device-width: 1024px) and (orientation: landscape) {
     .msg_container_base {
-        max-height: 70vh;
-        height: 75vh;
+        max-height: calc(100vh - 120px);
+        height: 100vh;
     }
 
     .chat-window {
         width: 100vw;
+        right:0;
     }
+
+    .chat-window > div {
+        padding: 0;
+        margin: 0;
+    }
+
 }
